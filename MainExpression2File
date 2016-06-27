@@ -1,0 +1,452 @@
+@name Chaingun DTurret tech3 brick B8 by sernikb2 
+@inputs Fire Reload [E_BASE]:entity [E_POD]:entity E:wirelink EXP:entity 
+@outputs OPS LN LN2 State CamPos:vector CamAngle:angle Barrel Synchronizer EXP_VEC:vector
+@persist Speed Recoil ReloadTime Direction:angle PODDirection:angle LN WRange Barrel Load Synchronizer
+@trigger 
+
+interval(55)
+if (first()) {
+State=0 
+WRange=3000
+Recoil=3
+LN=110
+LN2=LN*99
+ExplosionAnimation=1
+ExplosionScale = 0.5
+PushForce=100
+}
+#GETTING ANGLE FROM POD > PLAYER EYES CUZ WHY THE HELL NOT
+PODDirection = E_POD:driver():eyeAngles()
+#OPS output
+OPS=ops()
+#CREATING HOLOS
+if (Reload) {
+holoDeleteAll()
+}
+if (first()|Reload|State==3) {
+    if (State==3) {
+        
+        if (LN>130) {holoDelete(LN-20)}
+                LN++
+                LN2++
+        
+        }
+State=0
+if (Reload) {
+holoDelete(LN)
+holoDelete(LN2)
+        LN++
+        LN2++
+}
+if (Reload|first()) {
+#BASE BASE HOLOS FOR DECORATION
+holoCreate(60)
+holoParent(60, E_BASE)
+holoScale(60, vec(1,5,4.3))
+holoModel(60, "models/holograms/rcube_thick.mdl" )
+holoMaterial(60, "models/props_canal/metalwall005b")
+holoColor(60, vec(155,155,155))
+holoPos(60,E_BASE:pos() +vec(-2,0,60))
+
+holoCreate(61)
+holoParent(61, E_BASE)
+holoScale(61, vec(2.5,2.5,2.5))
+holoModel(61, "hq_cylinder" )
+holoMaterial(61, "models/props_canal/metalwall005b")
+holoColor(61, vec(155,155,155))
+holoPos(61,E_BASE:pos() +vec(0,0,70))
+holoAng(61, +ang(0,90,0))
+
+#THE MAIN HOLO THAT RULES THEM ALL - CREATION
+holoCreate(99)
+holoScale(99, vec(4,3,4.5))
+holoModel(99, "models/holograms/rcube_thick.mdl" )
+holoMaterial(99, "models/props_canal/metalwall005b")
+
+#LESSER HOLOS BARREL 1
+#back extend thing
+holoCreate(72)
+holoParent(72, holoEntity(99))
+holoScale(72, vec(2.1,1.7,1.7))
+holoModel(72, "models/holograms/rcube_thick.mdl" )
+holoMaterial(72, "models/props_canal/metalwall005b")
+holoPos(72,holoEntity(99):pos() +vec(15,0,-20))
+
+
+#main firing barrel
+holoCreate(73)
+holoParent(73, holoEntity(99))
+holoScale(73, vec(7.5,7.5,7.5))
+holoModel(73, "models/weapons/shotgun_shell.mdl")
+holoColor(73, vec(155,255,255))
+holoAng(73, +ang(90,0,0))
+holoPos(73,holoEntity(99):pos() +vec(10,0,-45))
+
+
+#main firing barrel 2
+holoCreate(74)
+holoParent(74, holoEntity(99))
+holoScale(74, vec(1.2,1.2,1.2))
+holoModel(74, "models/props_c17/utilityconnecter006c.mdl")
+holoColor(74, vec(100,100,100))
+holoAng(74, +ang(180,0,0))
+holoPos(74,holoEntity(99):pos() +vec(15,0,-50))
+
+#LESSER HOLOS BARREL 2
+#back extend thing
+holoCreate(75)
+holoParent(75, holoEntity(99))
+holoScale(75, vec(2.1,1.7,1.7))
+holoModel(75, "models/holograms/rcube_thick.mdl" )
+holoMaterial(75, "models/props_canal/metalwall005b")
+holoPos(75,holoEntity(99):pos() +vec(-15,0,-20))
+
+#main firing barrel
+holoCreate(76)
+holoParent(76, holoEntity(99))
+holoScale(76, vec(7.5,7.5,7.5))
+holoModel(76, "models/weapons/shotgun_shell.mdl")
+holoColor(76, vec(155,255,255))
+holoAng(76, +ang(90,0,0))
+holoPos(76,holoEntity(99):pos() +vec(-20,0,-45))
+
+
+#main firing barrel 2
+holoCreate(77)
+holoParent(77, holoEntity(99))
+holoScale(77, vec(1.2,1.2,1.2))
+holoModel(77, "models/props_c17/utilityconnecter006c.mdl")
+holoColor(77, vec(100,100,100))
+holoAng(77, +ang(180,0,0))
+holoPos(77,holoEntity(99):pos() +vec(-15,0,-50))
+
+#COOLING SYS 1
+holoCreate(78)
+holoParent(78, holoEntity(99))
+holoScale(78, vec(1.2,1.2,1.2))
+holoModel(78, "models/maxofs2d/hover_propeller.mdl")
+holoMaterial(78, "models/props_canal/metalwall005b")
+holoColor(78, vec(155,155,155))
+holoAng(78, +ang(0,0,0))
+holoPos(78,holoEntity(99):pos() +vec(-15,0,10))
+
+#COOLING SYS 2
+holoCreate(79)
+holoParent(79, holoEntity(99))
+holoScale(79, vec(1.2,1.2,1.2))
+holoModel(79, "models/maxofs2d/hover_propeller.mdl")
+holoMaterial(79, "models/props_canal/metalwall005b")
+holoColor(79, vec(155,155,155))
+holoAng(79, +ang(0,0,0))
+holoPos(79,holoEntity(99):pos() +vec(15,0,10))
+
+
+
+
+
+
+    }
+}
+  
+#THE MAIN HOLO THAT RULES THEM ALL - UPDATE
+holoAng(99,PODDirection +ang(0,0,90)) 
+holoPos(99,E_BASE:pos() +vec(0,0,100))
+
+if (State>=1) {
+EXP:setPos(holoEntity(LN):pos()+vec(0,0,-10))
+EXP:setAng(holoEntity(LN):angles() +ang(random(0,360),random(0,36),random(0,360)))
+EXP_VEC=vec(0,255,255)
+} else {
+EXP:setPos(E_BASE:pos()+vec(0,0,0))
+EXP:setAng(E_BASE:angles() +ang(0,0,0))
+EXP_VEC=vec(0,0,0)
+}
+Direction = holoEntity(99):forward():toAngle() #E_BASE:angles()
+
+#C.2-STATE START
+if (State==23) {
+#FOR EXPLOSION ANIMATION
+
+    holoScale(LN,vec(ExplosionScale*1.6,ExplosionScale*1.6,ExplosionScale*1.6))
+    holoAng(LN,ang(random(360,0),random(360,0),random(360,0)))
+    holoModel(LN,"models/effects/splode.mdl")
+    holoAlpha(LN,110)
+    holoColor(LN,vec(250,150,250))
+    
+    holoScale(LN2,vec(ExplosionScale*1.6,ExplosionScale*1.6,ExplosionScale*1.6))
+    holoAng(LN2,holoEntity(LN):angles() -ang(180,180,180))
+    holoModel(LN2,"models/effects/splode.mdl")
+    holoAlpha(LN2,110)
+    holoColor(LN2,vec(250,150,250))
+
+    interval(1000)
+    State=3
+}
+#C.2 STATE END
+
+#C.1-STATE START
+
+if (State==22) {
+#FOR EXPLOSION ANIMATION
+
+    holoScale(LN,vec(ExplosionScale*1.2,ExplosionScale*1.2,ExplosionScale*1.2))
+    holoAng(LN,ang(random(360,0),random(360,0),random(360,0)))
+    holoModel(LN,"models/effects/splode.mdl")
+    holoAlpha(LN,125)
+    holoColor(LN,vec(250,150,250))
+    
+    holoScale(LN2,vec(ExplosionScale*1.2,ExplosionScale*1.2,ExplosionScale*1.2))
+    holoAng(LN2,holoEntity(LN):angles() -ang(180,180,180))
+    holoModel(LN2,"models/effects/splode.mdl")
+    holoAlpha(LN2,125)
+    holoColor(LN2,vec(250,150,250))
+
+    interval(100)
+    State=23
+}
+#C.1 STATE END
+
+#C-STATE TWO START
+if (State==21) {
+#FOR EXPLOSION ANIMATION
+if (random(1,2)==1) {
+soundPlay(LN+30,1,"apshell_hit1.wav")
+} else {
+soundPlay(LN-30,1,"apshell_hit2.wav")
+}
+
+    holoScale(LN,vec(ExplosionScale*0.8,ExplosionScale*0.8,ExplosionScale*0.8))
+    holoAng(LN,ang(random(360,0),random(360,0),random(360,0)))
+    holoModel(LN,"models/effects/splode.mdl")
+    #holoModel(LN,"cube")
+    holoAlpha(LN,150)
+    holoColor(LN,vec(250,150,250))
+    
+    holoScale(LN2,vec(ExplosionScale*0.8,ExplosionScale*0.8,ExplosionScale*0.8))
+    holoAng(LN2,holoEntity(LN):angles() -ang(180,180,180))
+    holoModel(LN2,"models/effects/splode.mdl")
+    holoAlpha(LN2,150)
+    holoColor(LN2,vec(250,150,250))
+
+    interval(100)
+    State=22
+}
+
+
+#C-STATE WAIT 
+if (State==2) {if (Synchronizer==1) {if (ExplosionAnimation==1) {State=21}else{State=21}  }else{Synchronizer--}}
+#C-STATE STOP WAITING
+
+#B-FIRST STATE START
+if (State==1) {
+    rangerFilter(E_BASE)
+    rangerHitWater(1)
+    rangerHitEntities(1)
+    rangerIgnoreWorld(0) 
+    rangerFilter(E_BASE)
+    Ranger = rangerOffset(2000+random(-500,500),holoEntity(LN):pos(),holoEntity(LN):forward()) 
+    
+    #holoPos(LN, holoEntity(99):pos() )      
+    
+    holoEntity(LN):setTrails(50,0,0.2, "effects/beam001_red",vec(55,125,225),255,LN,3) "cable/cable"  "trails/smoke" "sprites/plasmabeam"  "sprites/laser" "trails/tube" "effects/beam001_white"
+    holoEntity(LN2):setTrails(25,0,0.1,"sprites/plasmabeam",vec(55,225,225),255,LN2,3)  "trails/smoke"
+    if(Ranger:hit()) { 
+       
+                Ranger:entity():applyOffsetForce(holoEntity(LN):up()*Ranger:entity():mass()*PushForce,Ranger:position())    "idk but it works soem how lol"
+                #soundStop(1)
+                #soundPlay(LN-10,5,"ambient/energy/ion_cannon_shot2.wav") "ambient/explosions/explode_1.wav" "weapons/elite/elite-1.wav"
+                #holoParent(LN,Ranger:entity())   
+                
+                holoPos(LN,Ranger:pos())  
+                
+                Synchronizer=4
+                State=2
+            
+                
+                } else 
+            {
+                holoPos(LN, holoEntity(LN):pos() +Direction:forward()*2000)
+                
+                State=1.1
+            }
+}
+
+#MOVEMENT STATE 3
+if (State==1.4) {
+     Ranger = rangerOffset(2000+random(-500,500),holoEntity(LN):pos(),holoEntity(LN):forward()) 
+    if(Ranger:hit()) { 
+    Ranger:entity():applyOffsetForce(holoEntity(LN):up()*Ranger:entity():mass()*PushForce,Ranger:position())
+    holoPos(LN,Ranger:pos())  
+    State=2
+    } else {
+    holoPos(LN, holoEntity(LN):pos() +Direction:forward()*2000)
+if (Synchronizer==1) {
+State=2
+}else {Synchronizer--}
+    }
+}
+#MOVEMENT STATE 3 END
+
+#MOVEMENT STATE 2
+if (State==1.3) {
+     Ranger = rangerOffset(2000+random(-500,500),holoEntity(LN):pos(),holoEntity(LN):forward()) 
+    if(Ranger:hit()) { 
+    Ranger:entity():applyOffsetForce(holoEntity(LN):up()*Ranger:entity():mass()*PushForce,Ranger:position())
+    holoPos(LN,Ranger:pos())  
+if (Synchronizer==1) {
+State=2
+}else {Synchronizer--}
+    } else {
+    holoPos(LN, holoEntity(LN):pos() +Direction:forward()*2000)
+    State=1.4
+    Synchronizer=1
+    }
+}
+#MOVEMENT STATE 2 END
+
+#MOVEMENT STATE 1
+if (State==1.2) {
+     Ranger = rangerOffset(2000+random(-500,500),holoEntity(LN):pos(),holoEntity(LN):forward()) 
+    if(Ranger:hit()) { 
+    Ranger:entity():applyOffsetForce(holoEntity(LN):up()*Ranger:entity():mass()*PushForce,Ranger:position())
+    holoPos(LN,Ranger:pos())  
+if (Synchronizer==1) {
+State=2
+}else {Synchronizer--}
+    } else {
+    holoPos(LN, holoEntity(LN):pos() +Direction:forward()*2000)
+    State=1.3
+    Synchronizer=2
+    }
+}
+#MOVEMENT STATE 1 END
+
+#MOVEMENT IDLE
+if (State==1.1) {
+    Synchronizer=3
+    State=1.2
+}
+#MOVEMENT IDLE END
+
+
+
+#ANIMATED EXPLOSION THING
+
+if (!Fire) {
+
+    IK=20
+    while (IK>=0) {
+    holoAlpha(LN,IK*5)
+    IK--
+    }
+    if (LN>130) {holoDelete(LN-20)}
+                LN++
+                LN2++
+}
+
+
+#B-FIRST BLOCK END
+
+#A-FIRE BLOCK START
+if (Fire&State==0) {
+    
+    #BARREL CHANGE
+if (Barrel) {Barrel=0} else {Barrel=1}
+    
+    #if (LN<99) {
+    #LN++
+#} else {
+ #LN=+100
+#}  
+
+    
+    PAngle=Direction +ang(random(Recoil*-1,Recoil),random(Recoil*-1,Recoil),random(Recoil*-1,Recoil))
+    
+    holoCreate(LN) #PROJECTILE
+    #holoModel(LN, ("models/props_phx/amraam.mdl"))
+    #holoModel(LN, ("models/Gibs/HGIBS.mdl")) 
+    #holoModel(LN, ("models/Items/Flare.mdl"))
+    holoAlpha(LN,250)
+    holoMaterial(LN,"models/props_combine/masterinterface01c")
+    holoModel(LN,"sphere")
+    holoScale(LN,vec(0.6,0.6,0.6))
+    holoScale(LN, vec(1,1,1))
+    if (Barrel) {
+    holoPos(LN, holoEntity(73):pos() )
+    } else {
+    holoPos(LN, holoEntity(76):pos() )
+    }
+    holoAng(LN, PAngle)
+    holoColor(LN,vec(250,150,250))
+    #holoMaterial(LN, "phoenix_storms/pack2/interior_top")
+    #holoMaterial(LN,"phoenix_storms/FuturisticTrackRamp_1-2")   
+    #holoMaterial(LN,"phoenix_storms/metal_plate")   
+    #holoEntity(LN):setTrails(10,0,10,"trails/smoke",vec(205,225,225),255)
+    holoEntity(LN):soundPlay(LN,1,"weapons/air_burster_explode2.wav") "weapons/vaccinator_charge_tier_04.wav"  "weapons/breadmonster/throwable/bm_throwable_throw.wav" 
+    #soundPlay(2,1,"weapons/aug/aug-1.wav")
+    #soundPlay(2,1,"weapons/p90/p90-1.wav")
+    soundPlay(LN*9,0.5,"ambient/energy/ion_cannon_shot1.wav")  "weapons/vaccinator_charge_tier_04.wav" "ambient/energy/ion_cannon_shot2.wav"
+        "ambient/energy/ion_cannon_shot2.wav" "ambient/explosions/explode_1.wav" "weapons/elite/elite-1.wav"
+    
+    #additionalEffect
+    holoCreate(LN2)
+    holoAlpha(LN2,50)
+    holoMaterial(LN2,"models/props_combine/masterinterface01c")
+    holoModel(LN2,"sphere")
+    holoScale(LN2,vec(-1.9,-1.9,-1.9))
+    holoParent(LN2,LN)
+    holoPos(LN2,holoEntity(LN):pos())
+    State=1
+} 
+#A-FIRE BLOCK END
+
+#MUZZLE EFFECT
+if (first()) {
+holoCreate(10)
+#holoModel(10,"models/effects/combineball.mdl")
+holoModel(10,"hq_cylinder")
+holoParent(10, holoEntity(99))
+holoScale(10,vec(-300,2.5,2.5))
+holoAng(10, +ang(0,0,-90))
+holoPos(10,holoEntity(99):pos() +vec(350,0,0))
+holoMaterial(10,"models/effects/comball_sphere")
+}
+if (Fire) {
+    if (State<=1) {
+    holoAlpha(10,random(130,250))
+    } else {
+    holoAlpha(10,random(30,50))
+    }
+    holoColor(10,vec(155,random(150,150),random(255,250)))
+    
+    if (Barrel) {
+        if (random(1,3)<=2) {
+    holoMaterial(76,"models/props_combine/masterinterface01c")
+    } else {holoMaterial(76,"")}
+    holoMaterial(73,"")
+    } else {
+        if (random(1,3)<=2) {
+    holoMaterial(73,"models/props_combine/masterinterface01c")
+    } else {holoMaterial(73,"")}
+    holoMaterial(76,"")
+    }
+    
+}else {
+    holoAlpha(10,0)
+    
+    holoMaterial(76,"")
+    holoMaterial(73,"")
+}
+
+#CameraControl
+CamPos = holoEntity(99):pos() +vec(0,0,100)
+CamAngle = holoEntity(99):angles() +ang(0,0,-90)
+#if (!Fire) {Load=100} elseif (Load>1) {Load=Load-5}
+
+    
+  "models/props_spytech/radar_top002.mdl"   
+    "models/effects/intro_vortshield.mdl"  
+    "models/perftest/loader.mdl"
+    "models/weapons/shotgun_shell.mdl"
+
+
